@@ -1,38 +1,33 @@
 from __future__ import division
 from __future__ import print_function
 
-import argparse
-import time
-from tqdm import tqdm
-import math
-import numpy as np
-from subprocess import check_output
-import sys
-sys.path.append('../')
+from data_utils import load_dataset
 from score_utils import calc_f1, calc_overlap_nmi, calc_jaccard, calc_omega
 from score_utils import normalized_overlap
-from data_utils import load_dataset
-
+from sklearn.cluster import KMeans 
+from subprocess import check_output
+from torch import optim
+from torch.autograd import Variable
+from tqdm import tqdm
+import argparse
+import collections
+import community
+import math
 import networkx as nx
 import numpy as np
+import numpy as np
+import numpy as np
+import numpy as np
+import re
 import scipy.sparse as sp
+import sys
+import time
 import torch
-import torch.nn.functional as F
-from torch import optim
-
+import torch
 import torch
 import torch.nn as nn
-import numpy as np
-from torch.autograd import Variable
+import torch.nn.functional as F
 
-import collections
-import re
-
-import community
-import torch
-import numpy as np
-from sklearn.cluster import KMeans import warnings
-warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='s', help="models used")
@@ -43,15 +38,12 @@ parser.add_argument('--embedding-dim', type=int, default=128, help='')
 parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate.')
 parser.add_argument('--dropout', type=float, default=0., help='Dropout rate (1 - keep probability).')
 parser.add_argument('--dataset-str', type=str, default='facebook0', help='type of dataset.')
-parser.add_argument('--log-file', type=str, default='tmplog', help='log path')
+parser.add_argument('--log-file', type=str, default='overlapping.log', help='log path')
 # parser.add_argument('--task', type=str, default='community', help='type of dataset.')
 
-
 def logging(args, epochs, cur_loss, f1, nmi, jaccard, modularity):
-    if args.log_file is None:
-        return
     with open(args.log_file, 'a+') as f:
-        f.write('{},{},{},{},{},{},{},{},{},{}\n'.format('gcn_vae',
+        f.write('{},{},{},{},{},{},{},{},{},{}\n'.format('vGraph',
             args.dataset_str,
             args.lr,
             cur_loss, args.lamda, epochs, f1, nmi, jaccard, modularity))
@@ -70,7 +62,6 @@ def preprocess(fpath):
     
     write_to_file(fpath, clist)
             
-
 def get_assignment(G, model, num_classes=5, tpe=0):
     model.eval()
     edges = [(u,v) for u,v in G.edges()]
@@ -111,7 +102,6 @@ def classical_modularity_calculator(graph, embedding, model='gcn_vae', cluster_n
     return modularity
 
 def loss_function(recon_c, q_y, prior, c, norm=None, pos_weight=None):
-    
     BCE = F.cross_entropy(recon_c, c, reduction='sum') / c.shape[0]
     # BCE = F.binary_cross_entropy_with_logits(recon_c, c, pos_weight=pos_weight)
     # return BCE
@@ -172,8 +162,6 @@ class GCNModelGumbel(nn.Module):
             
         return recon, F.softmax(q, dim=-1), prior
 
-
-
 def get_overlapping_community(G, model, tpe=1):
     model.eval()
     edges = [(u,v) for u,v in G.edges()]
@@ -204,6 +192,7 @@ def get_overlapping_community(G, model, tpe=1):
                 communities[j].append(i)
     
     return communities
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -264,7 +253,6 @@ if __name__ == '__main__':
                 res[e[1], :] += q[idx, :]
                 #res[e[0], :] += q[idx, :]/G.degree(e[0])
                 #res[e[1], :] += q[idx, :]/G.degree(e[1])
-
             # res /= res.sum(dim=-1).unsqueeze(-1).detach()
             # tmp = F.mse_loss(res[tmp_w], res[tmp_c])
 
@@ -287,13 +275,11 @@ if __name__ == '__main__':
         if epoch % 100 == 0:
             
             model.eval()
-            assert not model.training 
             
             assignment = get_assignment(G, model, categorical_dim)
             modularity = classical_modularity_calculator(G, assignment)
             
             communities = get_overlapping_community(G, model)
-
             nmi = calc_overlap_nmi(n_nodes, communities, gt_communities)
             f1 = calc_f1(n_nodes, communities, gt_communities)
             jaccard = calc_jaccard(n_nodes, communities, gt_communities)
