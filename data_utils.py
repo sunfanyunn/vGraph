@@ -337,7 +337,7 @@ def read_dblp_small2(fpath):
     return G, nx.adjacency_matrix(G), edge_labels
 
 def load_cora_citeseer(ds):
-    dirpath = '../data/{}'.format(ds)
+    dirpath = './data/{}'.format(ds)
     edge_path = dirpath + '/{}.cites'.format(ds)
     content_path = dirpath + '/{}.content'.format(ds)
     
@@ -378,7 +378,7 @@ def load_cora_citeseer(ds):
     return G, nx.adjacency_matrix(G), membership
 
 def load_webkb(ds):
-    dirpath = '../data/WebKB'
+    dirpath = './data/WebKB'
     edge_path = dirpath + '/{}.cites'.format(ds)
     content_path = dirpath + '/{}.content'.format(ds)
     G = nx.Graph()
@@ -429,8 +429,8 @@ def read_all_facebook():
             assert min(list(G.nodes())) == 0
 
         mapping = {}
-        edge_fpath = '../data/facebook/{}.edges'.format(fb_num)
-        label_fpath =  '../data/facebook/{}.circles'.format(fb_num)
+        edge_fpath = './data/facebook/{}.edges'.format(fb_num)
+        label_fpath =  './data/facebook/{}.circles'.format(fb_num)
         with open(edge_fpath, 'r') as f:
             for line in f:
                 e0, e1 = line.strip().split('\t')
@@ -463,8 +463,8 @@ def read_all_facebook():
 def read_facebook(ds, relabel=True):
     fb_num = int(ds[8:])
     print('using facebook', fb_num)
-    edge_fpath = '../data/facebook/{}.edges'.format(fb_num)
-    label_fpath =  '../data/facebook/{}.circles'.format(fb_num)
+    edge_fpath = './data/facebook/{}.edges'.format(fb_num)
+    label_fpath =  './data/facebook/{}.circles'.format(fb_num)
     if relabel:
         mapping = {}
         G = nx.Graph()
@@ -577,7 +577,7 @@ def read_data_author(dirpath, relabel=True):
             if relabel:
                 try:
                     e0 = mapping[e0]
-                except:
+                except: 
                     mapping[e0] = len(mapping)
                     e0 = mapping[e0]
 
@@ -606,7 +606,6 @@ def read_data_author(dirpath, relabel=True):
                     gt_communities[int(lb)].append(p)
 
     gt_communities = [list(set(x)) for x in gt_communities]
-    print('cool')
     return G, nx.adjacency_matrix(G), gt_communities
 
 def read_data_paper(dirpath, relabel=True):
@@ -758,39 +757,3 @@ def load_dataset(ds, relabel=True):
     print('number of communities', len(gt_communities))
 
     return G, adj, gt_communities
-
-if __name__ == '__main__':
-    G, adj, membership = load_amazon()
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_cora_citeseer('cora')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_cora_citeseer('citeseer')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_webkb('cornell')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_webkb('texas')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_webkb('washington')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)
-
-    G, adj, membership = load_webkb('wisconsin')
-    assert len(membership) == adj.shape[0]
-    assert -1 not in membership
-    print(adj.shape)

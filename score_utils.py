@@ -167,11 +167,14 @@ def calc_overlap_nmi(num_vertices, result_comm_list, ground_truth_comm_list):
             for c in clist:
                 f.write(' '.join(map(str, c)) + '\n')
 
-    write_to_file('./pred', result_comm_list)
-    write_to_file('./gt', ground_truth_comm_list)
-    assert len(result_comm_list) == len(ground_truth_comm_list)
-    ret = check_output(["./bin/onmi", "pred", "gt"]).decode('utf-8')
-    return float(ret.split('\n')[0].split()[-1])
+    try:
+        write_to_file('./pred', result_comm_list)
+        write_to_file('./gt', ground_truth_comm_list)
+        assert len(result_comm_list) == len(ground_truth_comm_list)
+        ret = check_output(["./bin/onmi", "pred", "gt"]).decode('utf-8')
+        return float(ret.split('\n')[0].split()[-1])
+    except:
+        print('calc_overlap_nmi failed.\n Please refer to this repo: https://github.com/eXascaleInfolab/OvpNMI')
 
 def calc_nonoverlap_nmi(pred_membership, gt_membership):
     from clusim.clustering import Clustering

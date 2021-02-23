@@ -3,3 +3,5 @@ numpy
 torch
 networkx
 scikit_learn
+python-louvain
+clusim

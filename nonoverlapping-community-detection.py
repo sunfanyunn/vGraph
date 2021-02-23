@@ -7,15 +7,12 @@ from subprocess import check_output
 from torch import optim
 from torch.autograd import Variable
 from tqdm import tqdm
-from utils import calc_nonoverlap_nmi
+from score_utils import calc_nonoverlap_nmi
 import argparse
 import collections
 import community
 import math
 import networkx as nx
-import numpy as np
-import numpy as np
-import numpy as np
 import numpy as np
 import re
 import scipy.sparse as sp
@@ -35,7 +32,7 @@ parser.add_argument('--epochs', type=int, default=1001, help='Number of epochs t
 parser.add_argument('--embedding-dim', type=int, default=128, help='')
 parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate.')
 parser.add_argument('--dropout', type=float, default=0., help='Dropout rate (1 - keep probability).')
-parser.add_argument('--dataset-str', type=str, default='facebook0', help='type of dataset.')
+parser.add_argument('--dataset-str', type=str, default='cora', help='type of dataset.')
 parser.add_argument('--log-file', type=str, default='nonoverlapping.log', help='log path')
 # parser.add_argument('--task', type=str, default='community', help='type of dataset.')
 
@@ -232,7 +229,7 @@ if __name__ == '__main__':
             modularity = classical_modularity_calculator(G, assignment)
             nmi = calc_nonoverlap_nmi(membership.tolist(), gt_membership)
             
-            print(epoch, nmi, modularity)
+            print('Epoch', epoch, 'nmi', nmi, 'modularity', modularity)
             logging(args, epoch, nmi, modularity)
             
     print("Optimization Finished!")
