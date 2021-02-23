@@ -30,7 +30,7 @@ import torch.nn.functional as F
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, default='s', help="models used")
+parser.add_argument('--model', type=str, default='vGraph', help="models used")
 parser.add_argument('--lamda', type=float, default=0, help="")
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=5001, help='Number of epochs to train.')
@@ -88,11 +88,11 @@ def get_assignment(G, model, num_classes=5, tpe=0):
     assignment = {i : res[i] for i in range(res.shape[0])}
     return assignment
 
-def classical_modularity_calculator(graph, embedding, model='gcn_vae', cluster_number=5):
+def classical_modularity_calculator(graph, embedding, model='vGraph', cluster_number=5):
     """
     Function to calculate the DeepWalk cluster centers and assignments.
     """    
-    if model == 'gcn_vae':
+    if model == 'vGraph':
         assignments = embedding
     else:
         kmeans = KMeans(n_clusters=cluster_number, random_state=0, n_init = 1).fit(embedding)

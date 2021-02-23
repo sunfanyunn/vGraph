@@ -141,9 +141,6 @@ def calc_jaccard(num_vertices, result_comm_list, ground_truth_comm_list):
     for _, nodes in ext_coms.items():
         tmp = [func(nodes, nodes2) for _, nodes2 in gt_coms.items()]
         f2_list.append(np.max(tmp))
-
-
-    # print(f1_list, f2_list)
     return (np.mean(f1_list) + np.mean(f2_list))/2
 
 
